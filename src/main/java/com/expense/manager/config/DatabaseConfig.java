@@ -1,31 +1,32 @@
 package com.expense.manager.config;
 
 import javax.sql.DataSource;
-import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 @Configuration
 public class DatabaseConfig {
 
+    @Autowired
+    private DataSourceProperties properties;
+
     @Bean
-    public DataSource dataSource(Environment env) {
-        String raw = env.getProperty("SPRING_DATASOURCE_URL");
-        if (raw == null || raw.isBlank()) {
-            raw = env.getProperty("spring.datasource.url");
+    public DataSource dataSource() {
+        String rawUrl = properties.getUrl();
+        if (rawUrl != null && rawUrl.startsWith("postgres://")) {
+            String jdbcUrl = "jdbc:postgresql://" + rawUrl.substring("postgres://".length());
+            if (!jdbcUrl.contains("?")) {
+                jdbcUrl += "?sslmode=require";
+            }
+            DataSourceProperties converted = new DataSourceProperties();
+            converted.setUrl(jdbcUrl);
+            converted.setUsername(properties.getUsername());
+            converted.setPassword(properties.getPassword());
+            converted.setDriverClassName("org.postgresql.Driver");
+            return converted.initializeDataSourceBuilder().build();
         }
-        if (raw != null && raw.startsWith("postgres://")) {
-            String jdbcUrl = "jdbc:postgresql://" + raw.substring("postgres://".length());
-            String username = env.getProperty("SPRING_DATASOURCE_USERNAME");
-            String password = env.getProperty("SPRING_DATASOURCE_PASSWORD");
-            return DataSourceBuilder.create()
-                    .driverClassName("org.postgresql.Driver")
-                    .url(jdbcUrl)
-                    .username(username)
-                    .password(password)
-                    .build();
-        }
-        return DataSourceBuilder.create().build();
+        return properties.initializeDataSourceBuilder().build();
     }
 }
