@@ -15,18 +15,29 @@ public class DatabaseConfig {
     @Bean
     public DataSource dataSource() {
         String rawUrl = properties.getUrl();
-        if (rawUrl != null && rawUrl.startsWith("postgres://")) {
-            String jdbcUrl = "jdbc:postgresql://" + rawUrl.substring("postgres://".length());
-            if (!jdbcUrl.contains("?")) {
-                jdbcUrl += "?sslmode=require";
-            }
-            DataSourceProperties converted = new DataSourceProperties();
-            converted.setUrl(jdbcUrl);
-            converted.setUsername(properties.getUsername());
-            converted.setPassword(properties.getPassword());
-            converted.setDriverClassName("org.postgresql.Driver");
-            return converted.initializeDataSourceBuilder().build();
+        if (rawUrl == null || rawUrl.isBlank()) {
+            rawUrl = "jdbc:postgresql://localhost:5432/expense_manager";
         }
-        return properties.initializeDataSourceBuilder().build();
+        String jdbcUrl = toJdbcUrl(rawUrl);
+        DataSourceProperties converted = new DataSourceProperties();
+        converted.setUrl(jdbcUrl);
+        converted.setUsername(properties.getUsername());
+        converted.setPassword(properties.getPassword());
+        converted.setDriverClassName("org.postgresql.Driver");
+        return converted.initializeDataSourceBuilder().build();
+    }
+
+    private String toJdbcUrl(String raw) {
+        String lower = raw.toLowerCase();
+        String jdbcUrl = raw;
+        if (lower.startsWith("postgres://") || lower.startsWith("postgresql://")) {
+            jdbcUrl = "jdbc:postgresql://" + raw.substring(raw.indexOf("://") + 3);
+        } else if (!lower.startsWith("jdbc:")) {
+            jdbcUrl = "jdbc:" + raw;
+        }
+        if (!jdbcUrl.contains("?")) {
+            jdbcUrl += "?sslmode=require";
+        }
+        return jdbcUrl;
     }
 }
