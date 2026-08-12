@@ -6,7 +6,6 @@ import com.expense.manager.entity.ChatMessage;
 import com.expense.manager.service.AIAssistantService;
 import com.expense.manager.util.UserContext;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -14,11 +13,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/assistant")
-@RequiredArgsConstructor
 public class AIAssistantController {
 
     private final AIAssistantService aiAssistantService;
     private final UserContext userContext;
+
+    public AIAssistantController(AIAssistantService aiAssistantService, UserContext userContext) {
+        this.aiAssistantService = aiAssistantService;
+        this.userContext = userContext;
+    }
 
     @PostMapping("/chat")
     public ResponseEntity<ChatResponse> chat(@Valid @RequestBody ChatRequest request) {
@@ -26,10 +29,10 @@ public class AIAssistantController {
                 userContext.getCurrentUserId(), request.getMessage());
 
         ChatResponse response = ChatResponse.builder()
-                .message((String) result.get("message"))
+                .message((String) result.get("response"))
                 .response((String) result.get("response"))
                 .intent((String) result.get("intent"))
-                .timestamp((Long) result.get("timestamp"))
+                .timestamp(((Number) result.get("timestamp")).longValue())
                 .build();
 
         return ResponseEntity.ok(response);
