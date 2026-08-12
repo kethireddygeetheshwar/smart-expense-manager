@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: smart-expense-manager
+    runtime: docker
+    plan: free
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: expense-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: expense-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: expense-db
+          property: password
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
+      - key: APP_JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        value: your-openai-key-here
+
+databases:
+  - name: expense-db
+    databaseName: expense_manager
+    user: expense_user
+    plan: free
+    region: singapore

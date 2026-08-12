@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Expense Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: { 50:'#f0f4ff',100:'#e0e8ff',200:'#c7d6fe',300:'#a4bdfc',400:'#7b9af8',500:'#5a75f2',600:'#4354e6',700:'#3640cb',800:'#2f35a4',900:'#1e2462',950:'#0f1128' },
+                        neon: { 400:'#c4ff4d',500:'#a3e635',600:'#84cc16' },
+                        coral: { 400:'#fb7185',500:'#f43f5e',600:'#e11d48' },
+                        electric: { 400:'#38bdf8',500:'#0ea5e9',600:'#0284c7' },
+                        surface: { 50:'#fafbff',100:'#f1f5f9',200:'#e2e8f0',700:'#334155',800:'#1e293b',900:'#0f172a',950:'#020617' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        * { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0f1128; }
+        ::-webkit-scrollbar-thumb { background: #4354e6; border-radius: 3px; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); }
+        .glass-strong { background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .gradient-bg { background: linear-gradient(145deg, #0f1128 0%, #1a1145 30%, #0f1128 60%, #0d1a2d 100%); }
+        .gradient-accent { background: linear-gradient(135deg, #5a75f2 0%, #a3e635 100%); }
+        .gradient-coral { background: linear-gradient(135deg, #f43f5e 0,#fb7185 100%); }
+        .gradient-electric { background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); }
+        .card-hover { transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 25px 50px rgba(90,117,242,0.15); }
+        .sidebar-link { transition: all 0.25s ease; border-left: 3px solid transparent; }
+        .sidebar-link.active { background: linear-gradient(90deg, rgba(90,117,242,0.15), transparent); border-left-color: #a3e635; color: #a3e635; }
+        .sidebar-link:hover:not(.active) { background: rgba(255,255,255,0.03); border-left-color: rgba(255,255,255,0.2); }
+        .pulse-dot { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+        .fade-in { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .chat-bubble { animation: chatIn 0.3s ease; }
+        @keyframes chatIn { from { opacity:0; transform:scale(0.95) translateY(5px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .progress-bar { transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+        .btn-glow { box-shadow: 0 0 24px rgba(90,117,242,0.35); }
+        .btn-glow:hover { box-shadow: 0 0 36px rgba(90,117,242,0.5); }
+        .neon-glow { box-shadow: 0 0 20px rgba(163,230,53,0.3); }
+        .neon-text { color: #a3e635; text-shadow: 0 0 12px rgba(163,230,53,0.4); }
+        .stat-card { position: relative; overflow: hidden; }
+        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,#5a75f2,#a3e635); }
+        .stat-card.coral::before { background:linear-gradient(90deg,#f43f5e,#fb7185); }
+        .stat-card.electric::before { background:linear-gradient(90deg,#0ea5e9,#38bdf8); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #5a75f2 !important; box-shadow: 0 0 0 3px rgba(90,117,242,0.15); }
+        .modal-content { animation: modalIn 0.3s ease; }
+        @keyframes modalIn { from { opacity:0; transform:scale(0.9) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+        .floating { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <div id="app"></div>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/expenses.js"></script>
+    <script src="js/budgets.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
