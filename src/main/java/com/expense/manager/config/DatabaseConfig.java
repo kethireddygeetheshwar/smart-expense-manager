@@ -18,26 +18,59 @@ public class DatabaseConfig {
         if (rawUrl == null || rawUrl.isBlank()) {
             rawUrl = "jdbc:postgresql://localhost:5432/expense_manager";
         }
-        String jdbcUrl = toJdbcUrl(rawUrl);
-        DataSourceProperties converted = new DataSourceProperties();
-        converted.setUrl(jdbcUrl);
-        converted.setUsername(properties.getUsername());
-        converted.setPassword(properties.getPassword());
-        converted.setDriverClassName("org.postgresql.Driver");
-        return converted.initializeDataSourceBuilder().build();
+        if (isPostgresUrl(rawUrl)) {
+            DataSourceProperties converted = new DataSourceProperties();
+            converted.setDriverClassName("org.postgresql.Driver");
+            converted.setUrl(toJdbcUrl(rawUrl));
+            String[] creds = extractCredentials(rawUrl);
+            if (creds != null) {
+                converted.setUsername(creds[0]);
+                converted.setPassword(creds[1]);
+            } else {
+                converted.setUsername(properties.getUsername());
+                converted.setPassword(properties.getPassword());
+            }
+            return converted.initializeDataSourceBuilder().build();
+        }
+        return properties.initializeDataSourceBuilder().build();
+    }
+
+    private boolean isPostgresUrl(String raw) {
+        String lower = raw.toLowerCase();
+        return lower.startsWith("postgres://") || lower.startsWith("postgresql://");
     }
 
     private String toJdbcUrl(String raw) {
-        String lower = raw.toLowerCase();
-        String jdbcUrl = raw;
-        if (lower.startsWith("postgres://") || lower.startsWith("postgresql://")) {
-            jdbcUrl = "jdbc:postgresql://" + raw.substring(raw.indexOf("://") + 3);
-        } else if (!lower.startsWith("jdbc:")) {
-            jdbcUrl = "jdbc:" + raw;
+        String body = raw.substring(raw.indexOf("://") + 3);
+        String hostPortDb = body;
+        int at = body.lastIndexOf('@');
+        if (at >= 0) {
+            hostPortDb = body.substring(at + 1);
         }
-        if (!jdbcUrl.contains("?")) {
-            jdbcUrl += "?sslmode=require";
+        int slash = hostPortDb.indexOf('/');
+        String hostPort = slash >= 0 ? hostPortDb.substring(0, slash) : hostPortDb;
+        String db = slash >= 0 ? hostPortDb.substring(slash + 1) : "";
+        if (hostPort.indexOf(':') < 0) {
+            hostPort = hostPort + ":5432";
         }
-        return jdbcUrl;
+        String jdbc = "jdbc:postgresql://" + hostPort + "/" + db;
+        if (!jdbc.contains("?")) {
+            jdbc += "?sslmode=require";
+        }
+        return jdbc;
+    }
+
+    private String[] extractCredentials(String raw) {
+        String body = raw.substring(raw.indexOf("://") + 3);
+        int at = body.indexOf('@');
+        if (at < 0) {
+            return null;
+        }
+        String userInfo = body.substring(0, at);
+        int colon = userInfo.indexOf(':');
+        if (colon < 0) {
+            return new String[]{userInfo, ""};
+        }
+        return new String[]{userInfo.substring(0, colon), userInfo.substring(colon + 1)};
     }
 }
