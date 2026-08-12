@@ -3,6 +3,7 @@ services:
     name: smart-expense-manager
     runtime: docker
     plan: free
+    region: singapore
     envVars:
       - key: SPRING_DATASOURCE_URL
         fromDatabase:
