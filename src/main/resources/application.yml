@@ -5,13 +5,13 @@ spring:
   application:
     name: smart-expense-manager
   datasource:
-    url: jdbc:postgresql://localhost:5432/expense_manager
-    username: postgres
-    password: Mahaganapathi@4
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/expense_manager}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${JPA_DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
@@ -23,15 +23,15 @@ spring:
 
 app:
   jwt:
-    secret: mySecretKeyForJWTTokenGenerationThatIsLongEnoughForHS512Algorithm123456789
-    expiration-ms: 86400000
+    secret: ${JWT_SECRET:}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY:your-api-key-here}
-      model: gpt-4o-mini
-      base-url: https://api.openai.com/v1
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-4o-mini}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
 
 logging:
   level:
-    com.expense.manager: DEBUG
+    com.expense.manager: INFO
     org.springframework.security: INFO
